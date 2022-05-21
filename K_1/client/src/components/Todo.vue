@@ -141,15 +141,6 @@ form button {
 
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css ");
 
-/* .title {
-  font-family: 'MedievalSharp', cursive;
-  color: #ffffff;
-  z-index: 2;
-  margin: 0.2rem;
-  margin-top: 8rem;
-  padding: 0rem;
-} */
-
 .completed {
   text-decoration: line-through;
 }
