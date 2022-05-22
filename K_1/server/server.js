@@ -8,7 +8,7 @@ let todos = require("./todo.json"); // funkar?
 
 // Här skapar vi servern. Vi kollar vilken metod som requesten har med sig.
 const app = http.createServer((req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:4000");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
