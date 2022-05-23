@@ -1,5 +1,5 @@
-const { recordExpression } = require("@babel/types");
 const http = require("http");
+const fs = require("fs");
 const { readFile, writeFile } = require("./hooks"); // glöm inte skriva funktionerna i separat fil!
 
 const port = 4000;
@@ -26,7 +26,7 @@ const app = http.createServer((req, res) => {
   const tasks = req.url.split("/");
   //GET single todos
 
-  if (rec.method === "GET" && tasks[1] === "oneTodo") {
+  if (req.method === "GET" && req.url.split("/")[1] === "oneTodo") {
     try {
       const id = req.url.split("/");
       const parsedId = JSON.parse(id[2]);
@@ -196,7 +196,7 @@ const app = http.createServer((req, res) => {
   // });
 
   // Här lyssnar vi efter responsen på port 4000
-  app.listen(4000, () => {
-    console.log(`Servern lyssnar på ${port}`);
-  });
+});
+app.listen(4000, () => {
+  console.log(`Servern lyssnar på ${port}`);
 });
