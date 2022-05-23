@@ -24,22 +24,20 @@ const app = http.createServer((req, res) => {
   }
 
   const tasks = req.url.split("/");
-  //GET single todos
 
+  //GET single todos
   if (req.method === "GET" && req.url.split("/")[1] === "oneTodo") {
     try {
       const id = req.url.split("/");
       const parsedId = JSON.parse(id[2]);
       const todos = readFile("./todo.json");
       const parsedTodos = JSON.parse(todos);
-
       const todo = parsedTodos.filter((todo) => todo.id === parsedId);
       convertedTodo = JSON.stringify(todo, null, 2);
       res.writeHead(200, {
         "Content-Type": "application/json",
         data: "One todo recieveth.",
       });
-
       res.end(convertedTodo);
     } catch (err) {
       console.log(`Something fucked up in todo ${err}.`);
@@ -50,7 +48,6 @@ const app = http.createServer((req, res) => {
         "Content-Type": "application/json",
         data: "todos recieveth successfully.",
       });
-
       res.end(JSON.stringify(todos, null, 2));
     } catch (err) {
       console.log(`Something went wrong with the todo ${err}.`);
@@ -61,6 +58,7 @@ const app = http.createServer((req, res) => {
       const parsedTodos = JSON.parse(todos);
       req.on("data", (chunk) => {
         const data = JSON.parse(chunk);
+        console.log(data);
         const todo = {
           todo: data,
           id: Math.random(Math.floor() * 1000),
@@ -72,13 +70,13 @@ const app = http.createServer((req, res) => {
       });
       res.writeHead(201, {
         "Content-Type": "application/json",
-        data: "Posted OK.",
+        data: "Your post went well!",
       });
 
       res.end();
     } catch (err) {
       console.log(`Something went wrong in the post ${err}.`);
-    }
+    } // DELETE
   } else if (req.method === "DELETE") {
     try {
       const id = req.url.split("/");
@@ -129,7 +127,7 @@ const app = http.createServer((req, res) => {
     }
   } else if (req.method === "PATCH") {
     try {
-      const id = rec.url.split("/");
+      const id = req.url.split("/");
       const parsedId = JSON.parse(id[1]);
       const todos = readFile("./todo.json");
       const parsedTodos = JSON.parse(todos);
