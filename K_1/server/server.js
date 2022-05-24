@@ -5,6 +5,7 @@ const { readFile, writeFile } = require("./hooks"); // glöm inte skriva funktio
 const port = 4000;
 
 let todos = require("./todo.json"); // funkar?
+const { recordExpression } = require("@babel/types");
 
 // Här skapar vi servern. Vi kollar vilken metod som requesten har med sig.
 const app = http.createServer((req, res) => {
@@ -33,7 +34,7 @@ const app = http.createServer((req, res) => {
       const todos = readFile("./todo.json");
       const parsedTodos = JSON.parse(todos);
       const todo = parsedTodos.filter((todo) => todo.id === parsedId);
-      convertedTodo = JSON.stringify(todo, null, 2);
+      const convertedTodo = JSON.stringify(todo, null, 2);
       res.writeHead(200, {
         "Content-Type": "application/json",
         data: "One todo recieveth.",
@@ -57,17 +58,18 @@ const app = http.createServer((req, res) => {
       const todos = readFile("./todo.json");
       const parsedTodos = JSON.parse(todos);
       req.on("data", (chunk) => {
+        console.log(chunk);
         const data = JSON.parse(chunk);
-        console.log(data);
         const todo = {
-          todo: data,
+          todo: data.name,
           id: Math.random(Math.floor() * 1000),
-          done: false,
+          done: data.done,
         };
         parsedTodos.push(todo);
         const convertedTodo = JSON.stringify(parsedTodos, null, 2);
         writeFile("./todo.json", convertedTodo);
       });
+
       res.writeHead(201, {
         "Content-Type": "application/json",
         data: "Your post went well!",
@@ -124,25 +126,33 @@ const app = http.createServer((req, res) => {
       });
     } catch (err) {
       console.log(`Something went wrong ${err}.`);
-    }
+    } // PATCH -- OK
   } else if (req.method === "PATCH") {
-    try {
-      const id = req.url.split("/");
-      const parsedId = JSON.parse(id[1]);
-      const todos = readFile("./todo.json");
-      const parsedTodos = JSON.parse(todos);
+    // try {
+    const id = req.url.split("/");
+    // const parsedId = JSON.parse(id[2]);
+    const todos = readFile("./todo.json");
+    const parsedTodos = JSON.parse(todos);
+    console.log(parsedTodos);
+    let todo = parsedTodos.filter((item) => {
+      return item.id === Number(id[2]);
+    });
+    let filterdTodos = parsedTodos.filter((item) => {
+      return item.id !== Number(id[2]);
+    });
+    if (todo.length === 0) {
+      res.statusCode = 404;
+      res.end("Can not find data with that id.");
+    }
+    req.on("data", (chunk) => {
+      const receivedData = JSON.parse(chunk);
+      const newTodos = {
+        ...todo[0],
+        ...receivedData,
+      };
+      filterdTodos.push(newTodos);
 
-      let todo = parsedTodos.filter((todo) => {
-        return todo.id === parsedId;
-      });
-      let filterdTodos = parsedTodos.filter((todo) => {
-        return todo.id !== parsedId;
-      });
-      todo[0].done = true;
-
-      filterdTodos.push(todo[0]);
-
-      convertedTodo = JSON.stringify(filterdTodos, null, 2);
+      const convertedTodo = JSON.stringify(filterdTodos, null, 2);
 
       writeFile("./todo.json", convertedTodo);
 
@@ -152,9 +162,11 @@ const app = http.createServer((req, res) => {
       });
 
       res.end();
-    } catch (err) {
-      console.log(`Something went wrong ${err}.`);
-    }
+    });
+
+    // } catch (err) {
+    //   console.log(`Something went wrong ${err}.`);
+    // }
   }
 
   // Om det blir en GET så sätter vi headern till text/html. Går allt som det ska så ger den status kod 200 som indikerar att allt funkar som det ska.
