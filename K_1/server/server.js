@@ -7,7 +7,6 @@ const port = 4000;
 let todos = require("./todo.json"); // funkar?
 const { recordExpression } = require("@babel/types");
 
-// Här skapar vi servern. Vi kollar vilken metod som requesten har med sig.
 const app = http.createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:4000");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -20,42 +19,37 @@ const app = http.createServer((req, res) => {
   if (req.method === "OPTIONS") {
     res.statusCode = 200;
     res.end();
-    // Eventuellt en return; här för att förhindra att den går vidare till de faktiska endpointsen nedan.
     return;
   }
 
   const tasks = req.url.split("/");
 
-  // if (tasks[1] === "todos" && req.method === "GET" && tasks.length === 3) { 
-  //   };
-
-    if (todo.length === 0) {
-    try {
-    const id = req.url.split("/");
-    const todos = readFile("./todo.json");
-    const requestedID = id[2];
-    const parsedTodos = JSON.parse(todos);
-
-    const todo = parsedTodos.filter((todo) => {}
-
-    const todo = parsedTodos.filter((todo) => {
-    console.log(todo.id, requestedID)});
-
-    const convertedTodo = JSON.stringify(todo, null, 2);
-
-    res.writeHead(200, {
-    "Content-Type": "application/json",
-    data: "One todo recieveth.",
-    });
-    res.end(convertedTodo);
-    console.log("Here return 200")
+  if (tasks[1] === "todos" && req.method === "GET" && tasks.length === 3) {
   }
 
-    } catch (err) {
-      console.log(`Something fucked up in todo ${err}.`);console.log("here return 404");/////////////////
-    } 
+  if (todo.length === 0) {
+    try {
+      const id = req.url.split("/");
+      const todos = readFile("./todo.json");
+      const requestedID = id[2];
+      const parsedTodos = JSON.parse(todos);
 
-    // GET all todos --OK/ ej kollat error handling
+      const todo = parsedTodos.filter((todo) => {
+        console.log(todo.id, requestedID);
+      });
+
+      const convertedTodo = JSON.stringify(todo, null, 2);
+
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+        data: "One todo recieveth.",
+      });
+      res.end(convertedTodo);
+      console.log("Here return 200");
+    } catch (err) {
+      console.log(`Something fucked up in todo ${err}.`);
+      console.log("here return 404");
+    }
   } else if (req.method === "GET") {
     try {
       res.writeHead(200, {
@@ -189,8 +183,8 @@ const app = http.createServer((req, res) => {
     //   console.log(`Something went wrong ${err}.`);
     // }
   }
+});
 
-};
-app.listen(4000, () => {
-  console.log(`Servern lyssnar på ${port}`);
+app.listen(port, () => {
+  console.log(`Server listening on ${port} `);
 });
