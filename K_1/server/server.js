@@ -25,9 +25,6 @@ const app = http.createServer((req, res) => {
   const tasks = req.url.split("/");
 
   if (tasks[1] === "todos" && req.method === "GET" && tasks.length === 3) {
-  }
-
-  if (todo.length === 0) {
     try {
       const id = req.url.split("/");
       const todos = readFile("./todo.json");
