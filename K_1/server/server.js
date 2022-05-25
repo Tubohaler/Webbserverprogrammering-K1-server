@@ -25,35 +25,34 @@ const app = http.createServer((req, res) => {
   }
 
   const tasks = req.url.split("/");
-  console.log(tasks);
-  console.log(req.method, tasks.length);
-  if (tasks[1] === "todos" && req.method === "GET" && tasks.length === 3) {
+
+  // if (tasks[1] === "todos" && req.method === "GET" && tasks.length === 3) { 
+  //   };
+
+    if (todo.length === 0) {
+    try {
     const id = req.url.split("/");
     const todos = readFile("./todo.json");
     const requestedID = id[2];
     const parsedTodos = JSON.parse(todos);
+
+    const todo = parsedTodos.filter((todo) => {}
+
     const todo = parsedTodos.filter((todo) => {
-      console.log(todo.id, requestedID);
+    console.log(todo.id, requestedID)});
+
+    const convertedTodo = JSON.stringify(todo, null, 2);
+
+    res.writeHead(200, {
+    "Content-Type": "application/json",
+    data: "One todo recieveth.",
     });
-    if (todo.length === 0) {
-      const todo = parsedTodos.filter((todo) => {
-        console.log(todo.id, requestedID)});
-
-      const convertedTodo = JSON.stringify(todo, null, 2);
-
-      res.writeHead(200, {
-      "Content-Type": "application/json",
-      data: "One todo recieveth.",});
-
-      console.log("Here return 200");
-
-    } else {
-      
-      catch (err) {
-      console.log(`Something fucked up in todo ${err}.`);console.log("here return 404");/////////////////
-    }
-    
     res.end(convertedTodo);
+    console.log("Here return 200")
+  }
+
+    } catch (err) {
+      console.log(`Something fucked up in todo ${err}.`);console.log("here return 404");/////////////////
     } 
 
     // GET all todos --OK/ ej kollat error handling
@@ -191,44 +190,7 @@ const app = http.createServer((req, res) => {
     // }
   }
 
-  // Om det blir en GET så sätter vi headern till text/html. Går allt som det ska så ger den status kod 200 som indikerar att allt funkar som det ska.
-  // res.setHeader("Content-Type", "text/html");
-  // res.statusCode = 200;
-  // res.end(JSON.stringify(todo)); // <-----------------------
-
-  //skickar den data, lägger till en Todo
-  //   if (req.method === "POST") {
-  //     req.on("data", (chunk) => {
-  //       // Pushar till objektet todo, sen gör om JS till JSON sträng.
-  //       todo.push(chunk.toString());
-  //     });
-  //     res.statusCode = 200;
-  //     req.end();
-  //   }
-
-  //   // Ändrar en Todo
-  //   if (req.method === "PUT") {
-  //     req.on("data", (chunk) => {
-  //       // Pushar till objektet todo, sen gör om JS till JSON sträng.
-  //       todo.push(chunk.toString());
-  //     });
-  //     res.statusCode = 200;
-  //     req.end();
-  //   }
-
-  //   // Delete en Todo
-  //   if (req.method === "DELETE" && tasks[1] === todos) {
-  //     req.on("data", (chunk) => {
-  //       // Pushar till objektet todo, sen gör om JS till JSON sträng.
-  //       todo.push(chunk.toString());
-  //     });
-  //     res.statusCode = 200;
-  //     req.end();
-  //   }
-  // });
-
-  // Här lyssnar vi efter responsen på port 4000
-});
+};
 app.listen(4000, () => {
   console.log(`Servern lyssnar på ${port}`);
 });
