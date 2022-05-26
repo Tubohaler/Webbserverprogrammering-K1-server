@@ -33,7 +33,6 @@ const app = http.createServer((req, res) => {
       const parsedTodos = JSON.parse(todos);
 
       const todo = parsedTodos.filter((todo) => todo.id === requestedID);
-      console.log(requestedID, todos);
 
       const convertedTodo = JSON.stringify(todo, null, 2);
 
@@ -44,7 +43,7 @@ const app = http.createServer((req, res) => {
       res.end(convertedTodo);
     } catch (err) {
       console.log(`Something fucked up in todo ${err}.`);
-      console.log("here return 404");
+
     } //GET all todos --OK
   } else if (req.method === "GET") {
     try {
@@ -55,13 +54,13 @@ const app = http.createServer((req, res) => {
       res.end(JSON.stringify(todos, null, 2));
     } catch (err) {
       console.log(`Something went wrong with the todo ${err}.`);
+   
     } //POST --OK/ ej kollat error handling
   } else if (req.method === "POST") {
     try {
       const todos = readFile("./todo.json");
       const parsedTodos = JSON.parse(todos);
       req.on("data", (chunk) => {
-        console.log(chunk);
         const data = JSON.parse(chunk);
         const todo = {
           todo: data.name,
@@ -72,30 +71,30 @@ const app = http.createServer((req, res) => {
         const convertedTodo = JSON.stringify(parsedTodos, null, 2);
         writeFile("./todo.json", convertedTodo);
       });
-
       res.writeHead(201, {
         "Content-Type": "application/json",
         data: "Your post went well!",
       });
-
       res.end();
     } catch (err) {
       console.log(`Something went wrong in the post ${err}.`);
-    } // DELETE
+   
+    } // DELETE --OK
   } else if (req.method === "DELETE") {
     try {
       const id = req.url.split("/");
-      const parsedId = JSON.parse(id[1]);
       const todos = readFile("./todo.json");
+      const parsedId = JSON.parse(id[2]);
+
       const parsedTodos = JSON.parse(todos);
-      const filteredParsedTodos = parsedTodos.filter((todo) => {
-        return todo.id !== parsedId;
+      const filteredParsedTodos = parsedTodos.filter((item) => {
+        return item.id !== Number(id[2]);
       });
       const convertedTodo = JSON.stringify(filteredParsedTodos, null, 2);
       writeFile("./todo.json", convertedTodo);
       res.writeHead(204, {
         "Content-Type": "application/json",
-        data: "Deleted successully.",
+        data: "Erased successully.",
       });
 
       res.end();
@@ -107,7 +106,6 @@ const app = http.createServer((req, res) => {
       const id = req.url.split("/");
       const todos = readFile("./todo.json");
       const parsedTodos = JSON.parse(todos);
-      console.log(parsedTodos);
       let todo = parsedTodos.filter((item) => {
         return item.id === Number(id[2]);
       });
@@ -151,7 +149,6 @@ const app = http.createServer((req, res) => {
     const id = req.url.split("/");
     const todos = readFile("./todo.json");
     const parsedTodos = JSON.parse(todos);
-    console.log(parsedTodos);
     let todo = parsedTodos.filter((item) => {
       return item.id === Number(id[2]);
     });
@@ -162,7 +159,7 @@ const app = http.createServer((req, res) => {
       res.statusCode = 404;
       res.end("Can not find data with that id.");
     }
-    req.on("data", (chunk) => {
+    req.on("data", (chunk) => {}
       const receivedData = JSON.parse(chunk);
       const newTodos = {
         ...todo[0],
@@ -177,13 +174,11 @@ const app = http.createServer((req, res) => {
       res.writeHead(204, {
         "Content-Type": "application/json",
         data: "Updated successfully.",
-      });
-
-      res.end();
     });
-    // } catch (err) {
-    //   console.log(`Something went wrong ${err}.`);
-    // }
+      res.end();
+     catch (err) {
+      console.log(`Something went wrong ${err}.`);
+    }
   }
 });
 
