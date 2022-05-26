@@ -145,7 +145,7 @@ const app = http.createServer((req, res) => {
       console.log(`Something went wrong ${err}.`);
     } // PATCH -- OK
   } else if (req.method === "PATCH") {
-    // try {
+    try {
     const id = req.url.split("/");
     const todos = readFile("./todo.json");
     const parsedTodos = JSON.parse(todos);
