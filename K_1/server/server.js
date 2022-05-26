@@ -154,12 +154,13 @@ const app = http.createServer((req, res) => {
     });
     let filterdTodos = parsedTodos.filter((item) => {
       return item.id !== Number(id[2]);
+
     });
     if (todo.length === 0) {
       res.statusCode = 404;
       res.end("Can not find data with that id.");
     }
-    req.on("data", (chunk) => {}
+    req.on("data", (chunk) => {
       const receivedData = JSON.parse(chunk);
       const newTodos = {
         ...todo[0],
@@ -176,7 +177,7 @@ const app = http.createServer((req, res) => {
         data: "Updated successfully.",
     });
       res.end();
-     catch (err) {
+    } catch (err) {
       console.log(`Something went wrong ${err}.`);
     }
   }
