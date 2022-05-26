@@ -24,16 +24,16 @@ const app = http.createServer((req, res) => {
 
   const tasks = req.url.split("/");
 
+  // GET one todo --OK
   if (tasks[1] === "todos" && req.method === "GET" && tasks.length === 3) {
     try {
       const id = req.url.split("/");
       const todos = readFile("./todo.json");
-      const requestedID = id[2];
+      const requestedID = parseInt(id[2]);
       const parsedTodos = JSON.parse(todos);
 
-      const todo = parsedTodos.filter((todo) => {
-        console.log(todo.id, requestedID);
-      });
+      const todo = parsedTodos.filter((todo) => todo.id === requestedID);
+      console.log(requestedID, todos);
 
       const convertedTodo = JSON.stringify(todo, null, 2);
 
@@ -42,11 +42,10 @@ const app = http.createServer((req, res) => {
         data: "One todo recieveth.",
       });
       res.end(convertedTodo);
-      console.log("Here return 200");
     } catch (err) {
       console.log(`Something fucked up in todo ${err}.`);
       console.log("here return 404");
-    }
+    } //GET all todos --OK
   } else if (req.method === "GET") {
     try {
       res.writeHead(200, {
@@ -102,7 +101,7 @@ const app = http.createServer((req, res) => {
       res.end();
     } catch (err) {
       console.log(`Something went wrong with deleting the todo ${err}.`);
-    } // PUT
+    } // PUT --OK
   } else if (req.method === "PUT") {
     try {
       const id = req.url.split("/");
@@ -112,22 +111,28 @@ const app = http.createServer((req, res) => {
       let todo = parsedTodos.filter((item) => {
         return item.id === Number(id[2]);
       });
-      let filterdTodos = parsedTodos.filter((item) => {
-        return item.id === Number(id[2]);
-      });
+
       if (todo.length === 0) {
         res.statusCode = 400;
         res.end("Can not find data with that id.");
       }
       req.on("data", (chunk) => {
         const receivedData = JSON.parse(chunk);
-        const newTodos = {
+
+        const newTodo = {
           ...todo[0],
           ...receivedData,
         };
-        filterdTodos.push(newTodos);
 
-        const convertedTodo = JSON.stringify(filterdTodos, null, 2);
+        const newTodos = parsedTodos.map((pt) => {
+          if (pt.id === Number(id[2])) {
+            return newTodo;
+          } else {
+            return pt;
+          }
+        });
+
+        const convertedTodo = JSON.stringify(newTodos, null, 2);
 
         writeFile("./todo.json", convertedTodo);
 
