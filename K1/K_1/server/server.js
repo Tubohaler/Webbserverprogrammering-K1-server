@@ -1,6 +1,6 @@
 const http = require("http");
 const fs = require("fs");
-const { readFile, writeFile } = require("./hooks");
+const { readFile, writeFile } = require("./hooks"); // glöm inte skriva funktionerna i separat fil!
 
 const port = 4000;
 
@@ -147,43 +147,43 @@ const app = http.createServer((req, res) => {
       console.log(`Something went wrong ${err}.`);
     } // PATCH -- OK
   } else if (req.method === "PATCH") {
-    try {
-      const id = req.url.split("/");
-      const todos = readFile("./todo.json");
-      const parsedTodos = JSON.parse(todos);
-      console.log(parsedTodos);
-      let todo = parsedTodos.filter((item) => {
-        return item.id === Number(id[2]);
-      });
-      let filterdTodos = parsedTodos.filter((item) => {
-        return item.id !== Number(id[2]);
-      });
-      if (todo.length === 0) {
-        res.statusCode = 404;
-        res.end("Can not find data with that id.");
-      }
-      req.on("data", (chunk) => {
-        const receivedData = JSON.parse(chunk);
-        const newTodos = {
-          ...todo[0],
-          ...receivedData,
-        };
-        filterdTodos.push(newTodos);
-
-        const convertedTodo = JSON.stringify(filterdTodos, null, 2);
-
-        writeFile("./todo.json", convertedTodo);
-
-        res.writeHead(204, {
-          "Content-Type": "application/json",
-          data: "Updated successfully.",
-        });
-
-        res.end();
-      });
-    } catch (err) {
-      console.log(`Something went wrong ${err}.`);
+    // try {
+    const id = req.url.split("/");
+    const todos = readFile("./todo.json");
+    const parsedTodos = JSON.parse(todos);
+    console.log(parsedTodos);
+    let todo = parsedTodos.filter((item) => {
+      return item.id === Number(id[2]);
+    });
+    let filterdTodos = parsedTodos.filter((item) => {
+      return item.id !== Number(id[2]);
+    });
+    if (todo.length === 0) {
+      res.statusCode = 404;
+      res.end("Can not find data with that id.");
     }
+    req.on("data", (chunk) => {
+      const receivedData = JSON.parse(chunk);
+      const newTodos = {
+        ...todo[0],
+        ...receivedData,
+      };
+      filterdTodos.push(newTodos);
+
+      const convertedTodo = JSON.stringify(filterdTodos, null, 2);
+
+      writeFile("./todo.json", convertedTodo);
+
+      res.writeHead(204, {
+        "Content-Type": "application/json",
+        data: "Updated successfully.",
+      });
+
+      res.end();
+    });
+    // } catch (err) {
+    //   console.log(`Something went wrong ${err}.`);
+    // }
   }
 });
 
