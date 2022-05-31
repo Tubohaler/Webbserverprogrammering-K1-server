@@ -4,18 +4,15 @@ const { readFile, writeFile } = require("./hooks"); // glöm inte skriva funktio
 
 const port = 4000;
 
-let todos = require("./todo.json"); // funkar?
-const { recordExpression } = require("@babel/types");
-
 const app = http.createServer((req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:4000");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, PATCH, DELETE, OPTIONS, POST, PUT"
   );
-
+  console.log("Recieved request: ", req.method);
   if (req.method === "OPTIONS") {
     res.statusCode = 200;
     res.end();
@@ -27,76 +24,66 @@ const app = http.createServer((req, res) => {
   // GET one todo --OK
   if (tasks[1] === "todos" && req.method === "GET" && tasks.length === 3) {
     try {
-      const id = req.url.split("/");
       const todos = readFile("./todo.json");
+      const id = req.url.split("/");
       const requestedID = parseInt(id[2]);
       const parsedTodos = JSON.parse(todos);
 
       const todo = parsedTodos.filter((todo) => todo.id === requestedID);
       console.log(requestedID, todos);
 
-      const convertedTodo = JSON.stringify(todo, null, 2);
+      const convertedTodo = JSON.stringify(todo);
 
       res.writeHead(200, {
         "Content-Type": "application/json",
-        data: "One todo recieveth.",
       });
       res.end(convertedTodo);
     } catch (err) {
       console.log(`Something fucked up in todo ${err}.`);
-      console.log("here return 404");
     } //GET all todos --OK
   } else if (req.method === "GET") {
     try {
+      const todos = readFile("./todo.json");
+
       res.writeHead(200, {
         "Content-Type": "application/json",
-        data: "todos recieveth successfully.",
       });
-      res.end(JSON.stringify(todos, null, 2));
+      res.end(JSON.stringify(todos));
     } catch (err) {
       console.log(`Something went wrong with the todo ${err}.`);
     } //POST --OK/ ej kollat error handling
   } else if (req.method === "POST") {
     try {
-      const todos = readFile("./todo.json");
-      const parsedTodos = JSON.parse(todos);
       req.on("data", (chunk) => {
-        console.log(chunk);
+        const todos = readFile("./todo.json");
         const data = JSON.parse(chunk);
         const todo = {
-          todo: data.name,
-          id: Math.random(Math.floor() * 1000),
+          name: data.name,
+          id: Math.floor(Math.random() * 100000),
           done: data.done,
         };
-        parsedTodos.push(todo);
-        const convertedTodo = JSON.stringify(parsedTodos, null, 2);
-        writeFile("./todo.json", convertedTodo);
+        todos.push(todo);
+        writeFile("./todo.json", todos);
       });
 
       res.writeHead(201, {
         "Content-Type": "application/json",
-        data: "Your post went well!",
       });
 
-      res.end();
+      res.end(todos);
     } catch (err) {
       console.log(`Something went wrong in the post ${err}.`);
     } // DELETE
   } else if (req.method === "DELETE") {
     try {
       const id = req.url.split("/");
-      const parsedId = JSON.parse(id[1]);
       const todos = readFile("./todo.json");
-      const parsedTodos = JSON.parse(todos);
-      const filteredParsedTodos = parsedTodos.filter((todo) => {
-        return todo.id !== parsedId;
+
+      const filteredTodos = todos.filter((item) => {
+        return item.id !== Number(id[2]);
       });
-      const convertedTodo = JSON.stringify(filteredParsedTodos, null, 2);
-      writeFile("./todo.json", convertedTodo);
-      res.writeHead(204, {
-        "Content-Type": "application/json",
-        data: "Deleted successully.",
-      });
+      writeFile("./todo.json", filteredTodos);
+      res.writeHead(204);
 
       res.end();
     } catch (err) {
@@ -138,7 +125,6 @@ const app = http.createServer((req, res) => {
 
         res.writeHead(204, {
           "Content-Type": "application/json",
-          data: "Updated successfully.",
         });
 
         res.end();
@@ -149,7 +135,7 @@ const app = http.createServer((req, res) => {
   } else if (req.method === "PATCH") {
     // try {
     const id = req.url.split("/");
-    const todos = readFile("./todo.json");
+    // const todos = readFile("./todo.json");
     const parsedTodos = JSON.parse(todos);
     console.log(parsedTodos);
     let todo = parsedTodos.filter((item) => {
