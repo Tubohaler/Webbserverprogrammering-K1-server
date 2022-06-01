@@ -1,11 +1,14 @@
 const http = require("http");
 const fs = require("fs");
 const { readFile, writeFile } = require("./hooks"); // glöm inte skriva funktionerna i separat fil!
+const { json } = require("express/lib/response");
 
 const port = 4000;
+const todos = readFile("./todo.json");
 
 const app = http.createServer((req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
@@ -55,7 +58,6 @@ const app = http.createServer((req, res) => {
   } else if (req.method === "POST") {
     try {
       req.on("data", (chunk) => {
-        const todos = readFile("./todo.json");
         const data = JSON.parse(chunk);
         const todo = {
           name: data.name,
@@ -64,13 +66,12 @@ const app = http.createServer((req, res) => {
         };
         todos.push(todo);
         writeFile("./todo.json", todos);
-      });
+        res.writeHead(201, {
+          "Content-Type": "application/json",
+        });
 
-      res.writeHead(201, {
-        "Content-Type": "application/json",
+        res.end(JSON.stringify(todos));
       });
-
-      res.end(todos);
     } catch (err) {
       console.log(`Something went wrong in the post ${err}.`);
     } // DELETE

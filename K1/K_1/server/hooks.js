@@ -1,12 +1,7 @@
 const fs = require("fs");
 
 function readFile(file) {
-  const rawData = fs.readFileSync(file, "utf8", (err, data) => {
-    if (err) {
-      console.log(err);
-    }
-    console.log(data);
-  });
+  const rawData = fs.readFileSync(file, "utf8");
   return JSON.parse(rawData);
 }
 
