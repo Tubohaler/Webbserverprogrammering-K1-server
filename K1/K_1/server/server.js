@@ -1,7 +1,6 @@
 const http = require("http");
 const fs = require("fs");
 const { readFile, writeFile } = require("./hooks");
-const { json } = require("express/lib/response");
 
 const port = 4000;
 const todos = readFile("./todo.json");
@@ -15,7 +14,7 @@ const app = http.createServer((req, res) => {
     "Access-Control-Allow-Methods",
     "GET, PATCH, DELETE, OPTIONS, POST, PUT"
   );
-  console.log("Recieved request: ", req.method);
+
   if (req.method === "OPTIONS") {
     res.statusCode = 200;
     res.end();
@@ -29,9 +28,8 @@ const app = http.createServer((req, res) => {
       const todos = readFile("./todo.json");
       const id = req.url.split("/");
       const requestedID = parseInt(id[2]);
-      const parsedTodos = JSON.parse(todos);
 
-      const todo = parsedTodos.filter((todo) => todo.id === requestedID);
+      const todo = todos.filter((todo) => todo.id === requestedID);
 
       const convertedTodo = JSON.stringify(todo);
 
@@ -92,16 +90,11 @@ const app = http.createServer((req, res) => {
     try {
       const id = req.url.split("/");
       const todos = readFile("./todo.json");
-      const parsedTodos = JSON.parse(todos);
 
-      let todo = parsedTodos.filter((item) => {
+      let todo = todos.filter((item) => {
         return item.id === Number(id[2]);
       });
 
-      if (todo.length === 0) {
-        res.statusCode = 400;
-        res.end("Can not find data with that id.");
-      }
       req.on("data", (chunk) => {
         const receivedData = JSON.parse(chunk);
 
@@ -110,7 +103,7 @@ const app = http.createServer((req, res) => {
           ...receivedData,
         };
 
-        const newTodos = parsedTodos.map((pt) => {
+        const newTodos = todos.map((pt) => {
           if (pt.id === Number(id[2])) {
             return newTodo;
           } else {
@@ -118,15 +111,16 @@ const app = http.createServer((req, res) => {
           }
         });
 
-        const convertedTodo = JSON.stringify(newTodos, null, 2);
-
-        writeFile("./todo.json", convertedTodo);
+        writeFile("./todo.json", newTodos);
 
         res.writeHead(204, {
           "Content-Type": "application/json",
         });
-
         res.end();
+        if (todo.length === 0) {
+          res.statusCode = 404;
+          res.end("Can not find data with that id.");
+        }
       });
     } catch (err) {
       console.log(`Something went wrong ${err}.`);
@@ -135,12 +129,11 @@ const app = http.createServer((req, res) => {
     // try {
     const id = req.url.split("/");
     const todos = readFile("./todo.json");
-    const parsedTodos = JSON.parse(todos);
 
-    let todo = parsedTodos.filter((item) => {
+    let todo = todos.filter((item) => {
       return item.id === Number(id[2]);
     });
-    let filterdTodos = parsedTodos.filter((item) => {
+    let filterdTodos = todos.filter((item) => {
       return item.id !== Number(id[2]);
     });
     if (todo.length === 0) {
@@ -155,9 +148,7 @@ const app = http.createServer((req, res) => {
       };
       filterdTodos.push(newTodos);
 
-      const convertedTodo = JSON.stringify(filterdTodos, null, 2);
-
-      writeFile("./todo.json", convertedTodo);
+      writeFile("./todo.json", newTodos);
 
       res.writeHead(204, {
         "Content-Type": "application/json",
