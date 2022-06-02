@@ -1,6 +1,6 @@
 const http = require("http");
 const fs = require("fs");
-const { readFile, writeFile } = require("./hooks"); // glöm inte skriva funktionerna i separat fil!
+const { readFile, writeFile } = require("./hooks");
 const { json } = require("express/lib/response");
 
 const port = 4000;
@@ -24,7 +24,6 @@ const app = http.createServer((req, res) => {
 
   const tasks = req.url.split("/");
 
-  // GET one todo --OK
   if (tasks[1] === "todos" && req.method === "GET" && tasks.length === 3) {
     try {
       const todos = readFile("./todo.json");
@@ -33,7 +32,6 @@ const app = http.createServer((req, res) => {
       const parsedTodos = JSON.parse(todos);
 
       const todo = parsedTodos.filter((todo) => todo.id === requestedID);
-      console.log(requestedID, todos);
 
       const convertedTodo = JSON.stringify(todo);
 
@@ -43,7 +41,7 @@ const app = http.createServer((req, res) => {
       res.end(convertedTodo);
     } catch (err) {
       console.log(`Something fucked up in todo ${err}.`);
-    } //GET all todos --OK
+    }
   } else if (req.method === "GET") {
     try {
       const todos = readFile("./todo.json");
@@ -54,7 +52,7 @@ const app = http.createServer((req, res) => {
       res.end(JSON.stringify(todos));
     } catch (err) {
       console.log(`Something went wrong with the todo ${err}.`);
-    } //POST --OK/ ej kollat error handling
+    }
   } else if (req.method === "POST") {
     try {
       req.on("data", (chunk) => {
@@ -74,7 +72,7 @@ const app = http.createServer((req, res) => {
       });
     } catch (err) {
       console.log(`Something went wrong in the post ${err}.`);
-    } // DELETE
+    }
   } else if (req.method === "DELETE") {
     try {
       const id = req.url.split("/");
@@ -89,13 +87,13 @@ const app = http.createServer((req, res) => {
       res.end();
     } catch (err) {
       console.log(`Something went wrong with deleting the todo ${err}.`);
-    } // PUT --OK
+    }
   } else if (req.method === "PUT") {
     try {
       const id = req.url.split("/");
       const todos = readFile("./todo.json");
       const parsedTodos = JSON.parse(todos);
-      console.log(parsedTodos);
+
       let todo = parsedTodos.filter((item) => {
         return item.id === Number(id[2]);
       });
@@ -132,13 +130,13 @@ const app = http.createServer((req, res) => {
       });
     } catch (err) {
       console.log(`Something went wrong ${err}.`);
-    } // PATCH -- OK
+    }
   } else if (req.method === "PATCH") {
     // try {
     const id = req.url.split("/");
-    // const todos = readFile("./todo.json");
+    const todos = readFile("./todo.json");
     const parsedTodos = JSON.parse(todos);
-    console.log(parsedTodos);
+
     let todo = parsedTodos.filter((item) => {
       return item.id === Number(id[2]);
     });
